@@ -18,14 +18,22 @@ import sys
 def extract_operations_and_comparisons(binary_path):
     """
     Extract transformation operations and comparison values from the binary.
-    Returns: (operations_by_offset, comparisons)
+    Returns: (ops_by_offset, comparisons)
     """
     # Disassemble the binary
-    result = subprocess.run(
-        ["objdump", "-M", "intel", "-d", binary_path],
-        capture_output=True,
-        text=True
-    )
+    try:
+        result = subprocess.run(
+            ["objdump", "-M", "intel", "-d", binary_path],
+            capture_output=True,
+            text=True,
+            check=True
+        )
+    except FileNotFoundError:
+        print("Error: objdump not found. Please install binutils.", file=sys.stderr)
+        sys.exit(1)
+    except subprocess.CalledProcessError as e:
+        print(f"Error: objdump failed: {e}", file=sys.stderr)
+        sys.exit(1)
     
     lines = result.stdout.split('\n')
     

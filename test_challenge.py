@@ -24,10 +24,12 @@ def test_binary_runs():
         )
         assert result.returncode in [0, 1], "Binary crashed or returned unexpected code"
         print("✓ Binary runs without crashing")
+        return True
     except subprocess.TimeoutExpired:
         print("✗ Binary timed out")
-        return False
-    return True
+        raise AssertionError("Binary timed out")
+    except Exception as e:
+        raise AssertionError(f"Binary execution failed: {e}")
 
 def test_wrong_password():
     """Test that wrong password is rejected"""
